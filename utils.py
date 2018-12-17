@@ -148,9 +148,9 @@ def make_image(tensor):
     if tensor.size(0) == 1:
         tensor = tensor.expand(3, tensor.size(1), tensor.size(2))
     # pdb.set_trace()
-    return scipy.misc.toimage(tensor.numpy(),
-                              high=255*tensor.max(),
-                              channel_axis=0)
+    img = tensor.numpy() * 255
+    img = img.astype('uint8')
+    return scipy.misc.toimage(img, high=255, channel_axis=0)
 
 def draw_text_tensor(tensor, text):
     np_x = tensor.transpose(0, 1).transpose(1, 2).data.cpu().numpy()
@@ -166,7 +166,9 @@ def save_gif(filename, inputs, duration=0.25):
         img = image_tensor(tensor, padding=0)
         img = img.cpu()
         img = img.transpose(0,1).transpose(1,2).clamp(0,1)
-        images.append(img.numpy())
+        img = img.numpy() * 255
+        img = img.astype('uint8')
+        images.append(img)
     imageio.mimsave(filename, images, duration=duration)
 
 def save_gif_with_text(filename, inputs, text, duration=0.25):
